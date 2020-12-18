@@ -28,7 +28,7 @@ class SNMPDevice:
 
 
 
-#ConfigPath = os.path.join(sys.path[0], 'config.yaml')
+#ConfigPath = os.path.join(sys.path[0], 'SNMP2MQTT.yaml')
 
 #with open(ConfigPath) as file:
 #    # The FullLoader parameter handles the conversion from YAML
