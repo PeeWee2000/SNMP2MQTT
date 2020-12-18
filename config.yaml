@@ -1,0 +1,50 @@
+ConfiguredDevices:
+  - Community:
+      ID: 1
+      Name: SmartDen1
+      Type: DenkoviIP32IN
+      Device0: 
+        Name: D0
+        OID: 1234
+        Type: Digital
+        MQTTName: waef
+      Device1: 
+        Name: D0
+        OID: 1234
+        Type: Digital
+  - SmartDen2:
+      Device0: 
+        Name: D0
+        OID: 1234
+        Type: Digital
+      Device1: 
+        Name: D0
+        OID: 1234
+        Type: Digital
+DeviceMessageConfigs:
+    - DenkoviIP32IN:
+      PinTypes:
+       Digital:
+        Name: PinTypeOID
+        Value: 1.3.6.1.4.1.42505.7.0.1
+       Analog:
+        Name: PinTypeOID
+        Value: 1.3.6.1.4.1.42505.7.0.2
+       Temperature:
+        Name: PinTypeOID
+        Value: 1.3.6.1.4.1.42505.7.0.3
+      MessageFormat:       
+       Names:
+        0: TicksOID
+        1: PinTypeOID
+        2: IPOID
+        3: CommunityOID
+        4: DeviceOID
+        5: PinOID
+       Values:
+        0: Ticks
+        1: PinType
+        2: IP
+        3: Community
+        4: DeviceID
+        5: PinState
