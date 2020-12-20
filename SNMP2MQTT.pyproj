@@ -23,7 +23,7 @@
     <Compile Include="SNMP2MQTT.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SNMP2MQTT.yaml">
+    <Content Include="SNMP2MQTT.json">
       <SubType>Code</SubType>
     </Content>
   </ItemGroup>
