@@ -72,11 +72,8 @@ for DeviceConfiguration in DeviceConfigurations:
     config.addV1System(snmpEngine, DeviceConfiguration['CommunityName'], DeviceConfiguration['CommunityName'])
     print("Added SNMP listener for " + DeviceConfiguration['DeviceName'] + " using community " + DeviceConfiguration['CommunityName'])
 
-
-
 #Load settings for each configured device
 SNMPConfigs = list(DataMap['SNMPConfigurations'])
-
 
 #This function should be optimized with lambdas but works just fine as is -- would've done it myself but I'm no python expert
 def cbFun(snmpEngine, stateReference, contextEngineId, contextName, VariablePairs, cbContext):
