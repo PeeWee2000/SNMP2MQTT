@@ -1,5 +1,5 @@
 {
-  "DeviceConfigurations": [
+  "DeviceConfiguration": [
     {
       "ID": 1,
       "IP": "192.168.86.22",
@@ -7,16 +7,21 @@
       "DeviceName": "DenkoviIP32IN",
       "ChildDevices": [
         {
-          "ID": 1,
-          "OID": "",
+          "Name": "Waef",
+          "OID": "1.1",
           "Type": "DigitalInput",
-          "MQTTName": ""
+          "MQTTTopic": "Testing",
+          "MQTTMessagePrefix": "{",
+          "MQTTMessageSuffix": "}"
         },
         {
-          "Name": "Digital1",
-          "OID": 1234,
+          "Name": "Waef",
+          "OID": "1.2",
           "Type": "DigitalInput",
-          "MQTTName": "waef"
+          "MQTTTopic": null,
+          "MQTTMessagePrefix": "",
+          "MQTTMessageSuffix": ""
+
         }
       ]
     },
@@ -40,7 +45,7 @@
       ]
     }
   ],
-  "SNMPConfigurations": [
+  "SNMPConfiguration": [
     {
       "DeviceName": "DenkoviIP32IN",
       "IdentifierOID": "1.3.6.1.6.3.1.1.4.3.0",

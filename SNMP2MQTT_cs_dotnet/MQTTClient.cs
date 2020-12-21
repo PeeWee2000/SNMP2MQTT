@@ -28,7 +28,6 @@ namespace SNMP2MQTT_cs_dotnet
             string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
             using (StreamReader FileReader = new StreamReader(SettingsPath))
             {
-
                 FileContents = FileReader.ReadToEnd();
             }
 
@@ -42,7 +41,7 @@ namespace SNMP2MQTT_cs_dotnet
                     .WithClientId(Environment.MachineName)
                     .WithTcpServer(Settings.MQTTBrokerIP, Settings.MQTTBrokerPort)
                     .WithCleanSession()
-                    .WithKeepAlivePeriod(TimeSpan.FromSeconds(60));
+                    .WithKeepAlivePeriod(TimeSpan.FromSeconds(65));
 
             if (Settings.MQTTBrokerUserName != "" && Settings.MQTTBrokerPassword != "")
             {
@@ -60,17 +59,10 @@ namespace SNMP2MQTT_cs_dotnet
             }
         }
 
-        public async void SendMessage()
+        public void SendMessage(MqttApplicationMessage Message)
         {
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic("MyTopic")
-                .WithPayload("Hello World")
-                .WithExactlyOnceQoS()
-                .WithRetainFlag()
-                .Build();
-
             lock (Client)
-            { Client.PublishAsync(message, CancellationToken.None); }
+            { Client.PublishAsync(Message, CancellationToken.None); }
         }
     }
 }

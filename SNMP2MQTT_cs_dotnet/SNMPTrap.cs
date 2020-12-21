@@ -19,7 +19,7 @@ namespace SNMP2MQTT_cs_dotnet
 			using (StreamReader FileReader = new StreamReader(SettingsPath))
 			{
 				string FileContents = FileReader.ReadToEnd();
-				Port = Int32.Parse(Regex.Match(FileContents, "(?<=\"SNMPTrapPort\"\\:\\s)\\d+").Value);			
+				Port = int.Parse(Regex.Match(FileContents, "(?<=\"SNMPTrapPort\"\\:\\s)\\d+").Value);			
 			}
 
 			// Construct a socket and bind it to the trap manager port 162
@@ -66,8 +66,11 @@ namespace SNMP2MQTT_cs_dotnet
 							Console.WriteLine("**** {0} {1}: {2}", v.Oid.ToString(), SnmpConstants.GetTypeName(v.Value.Type), v.Value.ToString());
 						}
 						Console.WriteLine("** End of SNMP Version 1 TRAP data.");
+
+
+						//MessageTranslator.MQTTClient.SendMessage();
 					}
-					else
+					else if (ver == (int)SnmpVersion.Ver2)
 					{
 						// Parse SNMP Version 2 TRAP packet
 						SnmpV2Packet pkt = new SnmpV2Packet();

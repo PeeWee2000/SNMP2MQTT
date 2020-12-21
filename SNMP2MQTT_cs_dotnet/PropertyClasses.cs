@@ -12,6 +12,7 @@ namespace SNMP2MQTT_cs_dotnet
         AnalogInput,
         TemperatureInputC,
         TemperatureInputF,
+        TemperatureInputK,
         DigitalOutput,
         AnalogOutput,
         Other
@@ -25,16 +26,20 @@ namespace SNMP2MQTT_cs_dotnet
 
     public class ChildDevice
     {
-        public int ID { get; set; }
         public string OID { get; set; }
-        public virtual ChildDeviceType ChildDeviceType { get; set; }
+        public DeviceType DeviceType { get; set; }
+        public string DeviceTypeOID { get; set; }
+        public string MQTTTopic { get; set; }
+        public string MQTTMessagePrefix { get; set; }
+        public string Value { get; set; }
+        public string MQTTMessageSuffix { get; set; }
     }    
 
-    public class DeviceConfigurations
+    public class DeviceConfiguration
     {
         public int ID { get; set; }
         public string IP { get; set; }
-        public string Community { get; set; }
+        public string CommunityName { get; set; }
         public string DeviceName { get; set; }
         public virtual ICollection<ChildDevice> ChildDevices { get; set; }
     }
@@ -46,13 +51,19 @@ namespace SNMP2MQTT_cs_dotnet
         public string OID { get; set; }
     }
 
-    public class SNMPConfigurations
+    public class SNMPConfiguration
     {
         public string DeviceName { get; set; }
         public string DeviceOID { get; set; }
         public string DeviceID { get; set; }
         public virtual ICollection<ChildDeviceType> ChildDeviceTypes { get; set; }
         public virtual ICollection<SNMPVariableBinding> SNMPVariableBindings { get; set; }
+    }
+
+    public class SNMPPayload
+    {
+        public SNMPConfiguration SNMPConfiguration { get; set; }
+        public List<ChildDevice> ChildDevices { get; set; }
     }
 
     public class MQTTSettings
