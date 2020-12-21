@@ -3,12 +3,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>1ce1aab2-0382-4ece-ae72-6a8103dedae1</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>SNMP2MQTT.py</StartupFile>
     <SearchPath>..\SNMP2MQTT</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>SNMP2MQTT</Name>
+    <Name>SNMP2MQTT_py</Name>
     <RootNamespace>SNMP2MQTT</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

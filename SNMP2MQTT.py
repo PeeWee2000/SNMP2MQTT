@@ -124,8 +124,8 @@ def cbFun(snmpEngine, stateReference, contextEngineId, contextName, VariablePair
             ChildDeviceID = VariablePairs[Sequence][0].prettyPrint() #Tuple 0 = Name
             ChildDeviceValue = VariablePairs[Sequence][1].prettyPrint() #Tuple 1 = Value
 
-    #for DeviceConfig in DeviceConfigurations :
 
+    #Client needs a keepalive job to be implemented so it doesn't have to connect every time -- this works without issue but isn't best practice
     client1.connect(broker,port)                             
     client1.publish("Wewo", CurrentDevice + " @ IP:" + IP + " " + ChildDeviceType + " " + ChildDeviceID + " = " + ChildDeviceValue)
 
@@ -133,14 +133,8 @@ ntfrcv.NotificationReceiver(snmpEngine, cbFun)
 
 snmpEngine.transportDispatcher.jobStarted(1)
 
-
 try:
     snmpEngine.transportDispatcher.runDispatcher()
 except:
     snmpEngine.transportDispatcher.closeDispatcher()
     raise
-
-
-
-
-
