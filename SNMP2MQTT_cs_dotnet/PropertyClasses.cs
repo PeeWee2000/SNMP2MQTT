@@ -8,6 +8,7 @@ namespace SNMP2MQTT_cs_dotnet
 {
     public enum DeviceType
     {
+        NotConfigured,
         DigitalInput,
         AnalogInput,
         TemperatureInputC,
@@ -69,6 +70,7 @@ namespace SNMP2MQTT_cs_dotnet
 
     public class MQTTSettings
     { 
+        public string MQTTClientName { get; set; }
         public string MQTTBrokerIP { get; set; }
         public int MQTTBrokerPort { get; set; }
         public string MQTTBrokerUserName { get; set; }

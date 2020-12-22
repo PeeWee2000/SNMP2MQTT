@@ -102,12 +102,12 @@
   "SNMPSettings": {
     "SNMPTrapPort": 162
   },
-  "MQTTSettings": 
-    {
-      "MQTTBrokerIP": "192.168.86.22",
-      "MQTTBrokerPort": 1883,
-      "MQTTBrokerUserName": "",
-      "MQTTBrokerPassword": "",
-      "MQTTBrokerPasswordEncrypted": ""
-    }
+  "MQTTSettings": {
+    "MQTTClientName": null,
+    "MQTTBrokerIP": "192.168.86.22",
+    "MQTTBrokerPort": 1883,
+    "MQTTBrokerUserName": "",
+    "MQTTBrokerPassword": "",
+    "MQTTBrokerPasswordEncrypted": ""
+  }
 }

@@ -37,8 +37,13 @@ namespace SNMP2MQTT_cs_dotnet
 
             var Settings = JsonConvert.DeserializeObject<MQTTSettings>(JSONSettings);
 
+            if (Settings.MQTTClientName == null)
+            {
+                Settings.MQTTClientName = "SNMP2MQTT - " + Environment.MachineName;
+            }
+
             var options = new MqttClientOptionsBuilder()
-                    .WithClientId(Environment.MachineName)
+                    .WithClientId(Settings.MQTTClientName)
                     .WithTcpServer(Settings.MQTTBrokerIP, Settings.MQTTBrokerPort)
                     .WithCleanSession()
                     .WithKeepAlivePeriod(TimeSpan.FromSeconds(65));

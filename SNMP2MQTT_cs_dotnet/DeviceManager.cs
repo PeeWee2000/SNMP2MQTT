@@ -16,14 +16,16 @@ namespace SNMP2MQTT_cs_dotnet
         private static DeviceConfiguration CurrentDeviceConfiguration;
         private static ChildDevice CurrentChildDevice;
         private static List<MqttApplicationMessage> Messages;
+        private static string SettingsPath;
 
         public DeviceManager()
         {
+            SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
+
             if (DeviceConfigurations == null)
             {
                 string FileContents;
 
-                string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
                 using (StreamReader FileReader = new StreamReader(SettingsPath))
                 {
                     FileContents = FileReader.ReadToEnd();
@@ -45,7 +47,7 @@ namespace SNMP2MQTT_cs_dotnet
 
             if (CurrentDeviceConfiguration != null)
             {
-                for (int i = 0; i <= SNMPPayload.ChildDevices.Count; i++)
+                for (int i = 0; i < SNMPPayload.ChildDevices.Count; i++)
                 {
                     CurrentChildDevice = SNMPPayload.ChildDevices[i];
 
@@ -142,51 +144,16 @@ namespace SNMP2MQTT_cs_dotnet
         private static void AddNewChildDeviceAndNotify()
         {
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("New child device detected -- adding to " + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json");
+            Console.WriteLine("New child device detected -- adding to " + SettingsPath);
             Console.WriteLine("Please fill out empty settings and restart the program once you are done adding new devices");
             Console.ForegroundColor = ConsoleColor.Gray;
 
             CurrentDeviceConfiguration.ChildDevices.Add(CurrentChildDevice);
             DeviceConfigurations.Add(CurrentDeviceConfiguration);
-
-            //string FileContents;
-
-            //string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
-            //using (StreamReader FileReader = new StreamReader(SettingsPath))
-            //{
-            //    FileContents = FileReader.ReadToEnd();
-            //}
-
-            //JObject ProgramSettings = JObject.Parse(FileContents);
-
-
-            //DeviceConfigurations = JsonConvert.DeserializeObject<List<DeviceConfiguration>>(JSONSettings);
-
-
-            //Get all device configs            
-            //Find config I want
-            //Remove old config from list of configs
-            //Add updated config back to list
-            //Serialize all updated device configs back into list
-            //Remove all old device configs in file
-            //Add all updatedconfigs back to file
-            //Save and close file
-
-
-            //Read file to string
-            string JSONContents = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json");
-            
-
+            string JSONContents = File.ReadAllText(SettingsPath);
             JObject AllSettings = JObject.Parse(JSONContents);
-
-
             var DeviceSettingsJSON = AllSettings[nameof(DeviceConfiguration)].ToString();
-
-
-
             DeviceConfigurations = JsonConvert.DeserializeObject<List<DeviceConfiguration>>(DeviceSettingsJSON);
-
-
 
             DeviceConfigurations.Where(i => i.DeviceIP == CurrentDeviceConfiguration.DeviceIP && i.DeviceID == CurrentDeviceConfiguration.DeviceID)
                                 .Select(i => i.ChildDevices)
@@ -194,17 +161,10 @@ namespace SNMP2MQTT_cs_dotnet
                                 .Add(CurrentChildDevice);
 
             AllSettings.Remove(nameof(DeviceConfiguration));
-
-
             string DeviceConfigurationsString = JsonConvert.SerializeObject(DeviceConfigurations);
-
-            var Test1 = AllSettings.ToString();
-
-            AllSettings.Add(nameof(DeviceConfiguration), DeviceConfigurationsString);
-
-            var Test = JsonConvert.SerializeObject(AllSettings);
-
-            File.WriteAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json", "wewo");
+            AllSettings.Add(nameof(DeviceConfiguration), JToken.Parse(DeviceConfigurationsString));
+            
+            File.WriteAllText(SettingsPath, AllSettings.ToString());
         }
     }
 }
