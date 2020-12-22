@@ -59,10 +59,16 @@ namespace SNMP2MQTT_cs_dotnet
             }
         }
 
-        public void SendMessage(MqttApplicationMessage Message)
+        public void SendMessage(List<MqttApplicationMessage> Messages)
         {
-            lock (Client)
-            { Client.PublishAsync(Message, CancellationToken.None); }
+            if (Messages != null)
+            { 
+                lock (Client)
+                { 
+                    foreach (var Message in Messages)
+                    { Client.PublishAsync(Message, CancellationToken.None); }
+                }
+            }
         }
     }
 }

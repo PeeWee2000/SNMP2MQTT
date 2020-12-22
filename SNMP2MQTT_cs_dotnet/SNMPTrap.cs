@@ -51,24 +51,34 @@ namespace SNMP2MQTT_cs_dotnet
 					var ver = SnmpPacket.GetProtocolVersion(indata, inlen);
 					if (ver == (int)SnmpVersion.Ver1)
 					{
+						var PayLoad = new SNMPPayload();
+						
+
 						// Parse SNMP Version 1 TRAP packet
 						SnmpV1TrapPacket pkt = new SnmpV1TrapPacket();
 						pkt.decode(indata, inlen);
-						Console.WriteLine("** SNMP Version 1 TRAP received from {0}:", inep.ToString());
-						Console.WriteLine("*** Trap generic: {0}", pkt.Pdu.Generic);
-						Console.WriteLine("*** Trap specific: {0}", pkt.Pdu.Specific);
-						Console.WriteLine("*** Agent address: {0}", pkt.Pdu.AgentAddress.ToString());
-						Console.WriteLine("*** Timestamp: {0}", pkt.Pdu.TimeStamp.ToString());
-						Console.WriteLine("*** VarBind count: {0}", pkt.Pdu.VbList.Count);
-						Console.WriteLine("*** VarBind content:");
-						foreach (Vb v in pkt.Pdu.VbList)
-						{
-							Console.WriteLine("**** {0} {1}: {2}", v.Oid.ToString(), SnmpConstants.GetTypeName(v.Value.Type), v.Value.ToString());
+
+
+						PayLoad.DeviceID = pkt.Pdu.Enterprise.ToString();
+						PayLoad.DeviceIP = pkt.Pdu.AgentAddress.ToString();
+						PayLoad.ChildDevices = new List<ChildDevice>();
+
+						foreach (Vb VariablePair in pkt.Pdu.VbList)
+						{							
+							var ChildDevice = new ChildDevice();
+							ChildDevice.OID = VariablePair.Oid.ToString();
+
+							if (VariablePair.Value.ToString() == null)
+							{ ChildDevice.Value = "0"; }
+							else
+							{ ChildDevice.Value = VariablePair.Value.ToString(); }
+
+							PayLoad.ChildDevices.Add(ChildDevice);
 						}
-						Console.WriteLine("** End of SNMP Version 1 TRAP data.");
+					
+						var Message = DeviceManager.ConvertPayloadToMessage(PayLoad);
 
-
-						//MessageTranslator.MQTTClient.SendMessage();
+						MessageTranslator.MQTTClient.SendMessage(Message);
 					}
 					else if (ver == (int)SnmpVersion.Ver2)
 					{
