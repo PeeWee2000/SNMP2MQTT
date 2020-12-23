@@ -49,35 +49,44 @@ namespace SNMP2MQTT_cs_dotnet
             {
                 for (int i = 0; i < SNMPPayload.ChildDevices.Count; i++)
                 {
-                    CurrentChildDevice = SNMPPayload.ChildDevices[i];
+                    if (CurrentDeviceConfiguration.ChildDevices == null)
+                    {
+                        CurrentDeviceConfiguration.ChildDevices = new List<ChildDevice>();
+                    }
 
-                    int NumberOfChildDevicesWithOID = CurrentDeviceConfiguration.ChildDevices.Where(i => i.OID == CurrentChildDevice.OID).Count();
+                    int NumberOfChildDevicesWithOID = CurrentDeviceConfiguration.ChildDevices.Where(x => x.OID == SNMPPayload.ChildDevices[i].OID).Count();
+                    if (NumberOfChildDevicesWithOID == 1)
+                    { 
+                        CurrentChildDevice = CurrentDeviceConfiguration.ChildDevices.Where(x => x.OID == SNMPPayload.ChildDevices[i].OID).Single();
+                        CurrentChildDevice.Value = SNMPPayload.ChildDevices[i].Value;
+                    }
+                    else
+                    {
+                        CurrentChildDevice = SNMPPayload.ChildDevices[i];
+                    }
+
+
 
                     if (CurrentDeviceConfiguration.ChildDevices.Contains(CurrentChildDevice)
                         && NumberOfChildDevicesWithOID == 1
                         && CurrentChildDevice.MQTTTopic != null)
                     {
-                        var Message = new MqttApplicationMessage();
-
-
-                        Message.Topic = CurrentChildDevice.MQTTTopic;
-                        Message.Payload = Encoding.UTF8.GetBytes(CurrentChildDevice.MQTTMessagePrefix + CurrentChildDevice.Value + CurrentChildDevice.MQTTMessageSuffix);
-                        // UTF8 is preferred for MQTT messaging https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/
-
+                        var Message = new MqttApplicationMessage
+                        {
+                            Topic = CurrentChildDevice.MQTTTopic,
+                            Payload = Encoding.UTF8.GetBytes(CurrentChildDevice.MQTTMessagePrefix + CurrentChildDevice.Value + CurrentChildDevice.MQTTMessageSuffix)
+                            // UTF8 is preferred for MQTT messaging https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/
+                        };
+                      
                         Messages.Add(Message);
                     }
                     else if (NumberOfChildDevicesWithOID > 1)
                     {
                         WarnOfDuplicateOIDs();
                     }
-                    else if (NumberOfChildDevicesWithOID == 1
-                            && CurrentChildDevice.MQTTTopic == null)
+                    else if (NumberOfChildDevicesWithOID == 1 && CurrentChildDevice.MQTTTopic == null)
                     {
-                        WarnOfUnconfiguredDevice();
-                    }
-                    else if (NumberOfChildDevicesWithOID == 1) //Note this condition is only hit because the others are not, meaning this criteria is not guaranteed to be specific to the circumstance
-                    {
-                        WarnOfChildDeviceConfigurationChange();
+                        WarnOfUnconfiguredChildDevice();
                     }
                     else //Note this condition is only hit because the others are not, meaning this criteria is not guaranteed to be specific to the circumstance
                     {
@@ -87,11 +96,14 @@ namespace SNMP2MQTT_cs_dotnet
 
                 return Messages;
             }
+            //else if (CurrentDeviceConfiguration != null && CurrentDeviceConfiguration.DeviceName == null)
+            //{
+            //    WarnOfUnconfiguredParentDevice();
+            //    return null;
+            //}
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Parent device not found mathcing IP: " + SNMPPayload.DeviceIP + " &  OID: " + SNMPPayload.DeviceID);
-                Console.ForegroundColor = ConsoleColor.Gray;
+                AddNewParentDeviceAndNotify(SNMPPayload);
                 return null;
             }
         }
@@ -109,36 +121,11 @@ namespace SNMP2MQTT_cs_dotnet
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        private static void WarnOfUnconfiguredDevice()
+        private static void WarnOfUnconfiguredChildDevice()
         {
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Warning message will not be converted -- device not fully configured: " + CurrentDeviceConfiguration.DeviceName + " - " + CurrentChildDevice.OID); ;
+            Console.WriteLine("Warning message will not be converted -- Child device not fully configured: " + CurrentDeviceConfiguration.DeviceName + " - " + CurrentChildDevice.OID); ;
             Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
-        private static void WarnOfChildDeviceConfigurationChange()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("Expected SNMP payload changed for device: " + CurrentDeviceConfiguration.DeviceName + " - " + CurrentChildDevice.OID);
-            Console.WriteLine("If this was expected ignore this message otherwise verify the internal SNMP device settings and MQTT conversion settings");
-            DeviceConfigurations.Remove(CurrentDeviceConfiguration);
-            CurrentDeviceConfiguration.ChildDevices.Add(CurrentChildDevice);
-            DeviceConfigurations.Add(CurrentDeviceConfiguration);
-
-            string FileContents;
-
-            string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
-            using (StreamReader FileReader = new StreamReader(SettingsPath))
-            {
-                FileContents = FileReader.ReadToEnd();
-            }
-
-            JObject ProgramSettings = JObject.Parse(FileContents);
-
-            var JSONSettings = ProgramSettings[nameof(DeviceConfiguration)].ToString();
-
-            DeviceConfigurations = JsonConvert.DeserializeObject<List<DeviceConfiguration>>(JSONSettings);
-
         }
 
         private static void AddNewChildDeviceAndNotify()
@@ -149,16 +136,33 @@ namespace SNMP2MQTT_cs_dotnet
             Console.ForegroundColor = ConsoleColor.Gray;
 
             CurrentDeviceConfiguration.ChildDevices.Add(CurrentChildDevice);
-            DeviceConfigurations.Add(CurrentDeviceConfiguration);
+            //DeviceConfigurations.Add(CurrentDeviceConfiguration);
+
+
             string JSONContents = File.ReadAllText(SettingsPath);
             JObject AllSettings = JObject.Parse(JSONContents);
             var DeviceSettingsJSON = AllSettings[nameof(DeviceConfiguration)].ToString();
             DeviceConfigurations = JsonConvert.DeserializeObject<List<DeviceConfiguration>>(DeviceSettingsJSON);
 
-            DeviceConfigurations.Where(i => i.DeviceIP == CurrentDeviceConfiguration.DeviceIP && i.DeviceID == CurrentDeviceConfiguration.DeviceID)
-                                .Select(i => i.ChildDevices)
-                                .SingleOrDefault()
-                                .Add(CurrentChildDevice);
+            if (DeviceConfigurations
+                .Where(i => i.DeviceIP == CurrentDeviceConfiguration.DeviceIP && i.DeviceID == CurrentDeviceConfiguration.DeviceID)
+                .SingleOrDefault()
+                .ChildDevices == null)
+            {
+                DeviceConfigurations
+                .Where(i => i.DeviceIP == CurrentDeviceConfiguration.DeviceIP && i.DeviceID == CurrentDeviceConfiguration.DeviceID)
+                .SingleOrDefault()
+                .ChildDevices = CurrentDeviceConfiguration.ChildDevices;
+            }
+            else
+            {
+                DeviceConfigurations.Where(i => i.DeviceIP == CurrentDeviceConfiguration.DeviceIP && i.DeviceID == CurrentDeviceConfiguration.DeviceID)
+                    .Select(i => i.ChildDevices)
+                    .SingleOrDefault()
+                    .Add(CurrentChildDevice);
+            }
+
+
 
             AllSettings.Remove(nameof(DeviceConfiguration));
             string DeviceConfigurationsString = JsonConvert.SerializeObject(DeviceConfigurations);
@@ -166,5 +170,41 @@ namespace SNMP2MQTT_cs_dotnet
             
             File.WriteAllText(SettingsPath, AllSettings.ToString());
         }
+
+        //private static void WarnOfUnconfiguredParentDevice()
+        //{
+        //    Console.ForegroundColor = ConsoleColor.DarkYellow;
+        //    Console.WriteLine("Warning message will not be converted -- Parent device not fully configured: " + CurrentDeviceConfiguration.DeviceID + " - " + CurrentDeviceConfiguration.DeviceIP); ;
+        //    Console.ForegroundColor = ConsoleColor.Gray;
+        //}
+
+        private static void AddNewParentDeviceAndNotify(SNMPPayload SNMPPayload)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("New parent device found with IP: " + SNMPPayload.DeviceIP + " &  OID: " + SNMPPayload.DeviceID);
+            Console.WriteLine("Adding device to: " + SettingsPath);
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+
+            var NewDevice = new DeviceConfiguration();
+            NewDevice.DeviceIP = SNMPPayload.DeviceIP;
+            NewDevice.DeviceID = SNMPPayload.DeviceID;
+            NewDevice.DeviceCommunity = SNMPPayload.DeviceCommunity;
+
+            
+            string JSONContents = File.ReadAllText(SettingsPath);
+            JObject AllSettings = JObject.Parse(JSONContents);
+            var DeviceSettingsJSON = AllSettings[nameof(DeviceConfiguration)].ToString();
+            DeviceConfigurations = JsonConvert.DeserializeObject<List<DeviceConfiguration>>(DeviceSettingsJSON);
+            DeviceConfigurations.Add(NewDevice);
+            string DeviceConfigurationsString = JsonConvert.SerializeObject(DeviceConfigurations);
+
+
+            AllSettings.Remove(nameof(DeviceConfiguration));
+            AllSettings.Add(nameof(DeviceConfiguration), JToken.Parse(DeviceConfigurationsString));
+
+            File.WriteAllText(SettingsPath, AllSettings.ToString());
+        }
+
     }
 }

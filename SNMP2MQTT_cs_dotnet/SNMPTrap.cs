@@ -61,12 +61,14 @@ namespace SNMP2MQTT_cs_dotnet
 
 						PayLoad.DeviceID = pkt.Pdu.Enterprise.ToString();
 						PayLoad.DeviceIP = pkt.Pdu.AgentAddress.ToString();
+						PayLoad.DeviceCommunity = pkt.Community.ToString();
 						PayLoad.ChildDevices = new List<ChildDevice>();
 
 						foreach (Vb VariablePair in pkt.Pdu.VbList)
 						{							
 							var ChildDevice = new ChildDevice();
 							ChildDevice.OID = VariablePair.Oid.ToString();
+							ChildDevice.DeviceTypeOID = pkt.Pdu.Enterprise.ToString() + "." + pkt.Pdu.Specific.ToString();
 
 							if (VariablePair.Value.ToString() == null)
 							{ ChildDevice.Value = "0"; }

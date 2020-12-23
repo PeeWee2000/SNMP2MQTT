@@ -38,33 +38,26 @@ namespace SNMP2MQTT_cs_dotnet
 
     public class DeviceConfiguration
     {
-        public string DeviceID { get; set; } //AKA Enterprise in SNMP terms
+        public string DeviceID { get; set; } 
         public string DeviceIP { get; set; }
-        public string CommunityName { get; set; }
+        public string DeviceCommunity { get; set; }
         public string DeviceName { get; set; }
         public virtual List<ChildDevice> ChildDevices { get; set; }
     }
 
-    public class SNMPVariableBinding
-    {
-        public int Sequence { get; set; }
-        public string Name { get; set; }
-        public string OID { get; set; }
-    }
 
     public class SNMPConfiguration
     {
         public string DeviceName { get; set; }
-        public string DeviceOID { get; set; } 
-        public string DeviceID { get; set; } //AKA Enterprise in SNMP terms
+        public string DeviceEnterprise { get; set; }
         public virtual List<ChildDeviceType> ChildDeviceTypes { get; set; }
-        public virtual List<SNMPVariableBinding> SNMPVariableBindings { get; set; }
     }
 
     public class SNMPPayload
     {
         public string DeviceIP { get; set; }
         public string DeviceID { get; set; }
+        public string DeviceCommunity { get; set; }
         public List<ChildDevice> ChildDevices { get; set; }
     }
 
