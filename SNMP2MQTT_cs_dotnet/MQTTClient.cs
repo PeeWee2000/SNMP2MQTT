@@ -1,16 +1,12 @@
 ﻿using MQTTnet;
 using MQTTnet.Client.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace SNMP2MQTT_cs_dotnet
 {
@@ -25,7 +21,7 @@ namespace SNMP2MQTT_cs_dotnet
             
             string FileContents;
 
-            string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
+            string SettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Settings.json");
             using (StreamReader FileReader = new StreamReader(SettingsPath))
             {
                 FileContents = FileReader.ReadToEnd();

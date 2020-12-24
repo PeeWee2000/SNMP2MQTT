@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using SnmpSharpNet;
+﻿using SnmpSharpNet;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +13,7 @@ namespace SNMP2MQTT_cs_dotnet
     {
 		public void Start()
 		{
-			string SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
+			string SettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Settings.json");
 			int Port = 0;
 			using (StreamReader FileReader = new StreamReader(SettingsPath))
 			{

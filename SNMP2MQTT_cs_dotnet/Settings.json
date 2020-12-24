@@ -1,102 +1,8 @@
 {
-  "DeviceConfiguration": [
-    {
-      "DeviceID": "1.3.6.1.4.1.42505.7",
-      "DeviceIP": "192.168.86.22",
-      "CommunityName": "Test",
-      "DeviceName": "DenkoviIP32IN",
-      "ChildDevices": [
-        {
-          "Name": "Waef",
-          "OID": "1.1",
-          "Type": "DigitalInput",
-          "MQTTTopic": "Testing",
-          "MQTTMessagePrefix": "{",
-          "MQTTMessageSuffix": "}"
-        },
-        {
-          "Name": "Waef",
-          "OID": "1.2",
-          "Type": "DigitalInput",
-          "MQTTTopic": null,
-          "MQTTMessagePrefix": "",
-          "MQTTMessageSuffix": ""
-
-        }
-      ]
-    },
-    {
-      "DeviceID": "1.3.6.1.4.1.42505.8",
-      "DeviceIP": "192.168.86.23",
-      "CommunityName": "SmartDen2",
-      "DeviceName": "DenkoviIP32IN",
-      "ChildDevices": [
-        {
-          "Name": "Digital0",
-          "OID": 1234,
-          "Type": "DigitalInput",
-          "MQTTName": "waef"
-        },
-        {
-          "Name": "Digital1",
-          "OID": 1234,
-          "Type": "DigitalInput",
-          "MQTTName": "waef"
-        }
-      ]
-    }
-  ],
   "SNMPConfiguration": [
     {
       "DeviceName": "DenkoviIP32IN",
-      "IdentifierOID": "1.3.6.1.6.3.1.1.4.3.0",
-      "IdentifierValue": "1.3.6.1.4.1.42505.7",
-      "ChildDeviceTypes": [
-        {
-          "Type": "DigitalInput",
-          "Value": "1.3.6.1.4.1.42505.7.0.1"
-        },
-        {
-          "Type": "AnalogInput",
-          "Value": "1.3.6.1.4.1.42505.7.0.2"
-        },
-        {
-          "Type": "TemperatureInputC",
-          "Value": "1.3.6.1.4.1.42505.7.0.3"
-        }
-      ],
-      "SNMPVariableBindings": [
-        {
-          "Sequence": 0,
-          "Name": "Ticks",
-          "OID": "1.3.6.1.2.1.1.3.0"
-        },
-        {
-          "Sequence": 1,
-          "Name": "ChildDeviceType",
-          "OID": "1.3.6.1.6.3.1.1.4.1.0"
-        },
-        {
-          "Sequence": 2,
-          "Name": "IP",
-          "OID": "1.3.6.1.6.3.18.1.3.0"
-        },
-        {
-          "Sequence": 3,
-          "Name": "Community",
-          "OID": "1.3.6.1.6.3.18.1.4.0"
-        },
-        {
-          "Sequence": 4,
-          "Name": "DeviceID",
-          "OID": "1.3.6.1.6.3.1.1.4.3.0"
-        },
-        {
-          "Sequence": 5,
-          "Name": "ChildDeviceValue",
-          "OID": "1.3.6.1.4.1.42505.7.2.1.1.7.8"
-        }
-      ]
+      "DeviceEnterprise": "1.3.6.1.4.1.42505.7"
     }
   ],
   "SNMPSettings": {
@@ -109,5 +15,8 @@
     "MQTTBrokerUserName": "",
     "MQTTBrokerPassword": "",
     "MQTTBrokerPasswordEncrypted": ""
-  }
+  },
+  "DeviceConfiguration": [
+
+  ]
 }

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SNMP2MQTT_cs_dotnet": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

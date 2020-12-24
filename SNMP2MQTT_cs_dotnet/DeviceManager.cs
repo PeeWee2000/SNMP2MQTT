@@ -20,7 +20,7 @@ namespace SNMP2MQTT_cs_dotnet
 
         public DeviceManager()
         {
-            SettingsPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\Settings.json";
+            SettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "Settings.json");
 
             if (DeviceConfigurations == null)
             {
