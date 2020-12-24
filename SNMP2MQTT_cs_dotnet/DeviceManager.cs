@@ -39,9 +39,9 @@ namespace SNMP2MQTT_cs_dotnet
             }
         }
 
-        public static List<MqttApplicationMessage> ConvertPayloadToMessage(SNMPPayload SNMPPayload)
+        public List<MqttApplicationMessage> ConvertPayloadToMessage(SNMPPayload SNMPPayload)
         {         
-            CurrentDeviceConfiguration = DeviceConfigurations.Where(i => i.DeviceID == SNMPPayload.DeviceID).FirstOrDefault();
+            CurrentDeviceConfiguration = DeviceConfigurations?.Where(i => i.DeviceID == SNMPPayload.DeviceID).FirstOrDefault();
 
             Messages = new List<MqttApplicationMessage>();
 

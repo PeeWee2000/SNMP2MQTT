@@ -22,6 +22,8 @@ namespace SNMP2MQTT_cs_dotnet
 				Port = int.Parse(Regex.Match(FileContents, "(?<=\"SNMPTrapPort\"\\:\\s)\\d+").Value);			
 			}
 
+			var DeviceManagerInstance = new DeviceManager();
+
 			// Construct a socket and bind it to the trap manager port 162
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 			IPEndPoint ipep = new IPEndPoint(IPAddress.Any, Port);
@@ -53,11 +55,9 @@ namespace SNMP2MQTT_cs_dotnet
 					{
 						var PayLoad = new SNMPPayload();
 						
-
 						// Parse SNMP Version 1 TRAP packet
 						SnmpV1TrapPacket pkt = new SnmpV1TrapPacket();
 						pkt.decode(indata, inlen);
-
 
 						PayLoad.DeviceID = pkt.Pdu.Enterprise.ToString();
 						PayLoad.DeviceIP = pkt.Pdu.AgentAddress.ToString();
@@ -68,7 +68,6 @@ namespace SNMP2MQTT_cs_dotnet
 						{							
 							var ChildDevice = new ChildDevice();
 							ChildDevice.OID = VariablePair.Oid.ToString();
-							ChildDevice.DeviceTypeOID = pkt.Pdu.Enterprise.ToString() + "." + pkt.Pdu.Specific.ToString();
 
 							if (VariablePair.Value.ToString() == null)
 							{ ChildDevice.Value = "0"; }
@@ -78,7 +77,7 @@ namespace SNMP2MQTT_cs_dotnet
 							PayLoad.ChildDevices.Add(ChildDevice);
 						}
 					
-						var Message = DeviceManager.ConvertPayloadToMessage(PayLoad);
+						var Message = DeviceManagerInstance.ConvertPayloadToMessage(PayLoad);
 
 						MessageTranslator.MQTTClient.SendMessage(Message);
 					}
@@ -94,22 +93,34 @@ namespace SNMP2MQTT_cs_dotnet
 						}
 						else
 						{
-							Console.WriteLine("*** Community: {0}", pkt.Community.ToString());
-							Console.WriteLine("*** VarBind count: {0}", pkt.Pdu.VbList.Count);
-							Console.WriteLine("*** VarBind content:");
-							foreach (Vb v in pkt.Pdu.VbList)
+							var PayLoad = new SNMPPayload();
+							PayLoad.DeviceID = pkt.Pdu.TrapObjectID.ToString();
+							PayLoad.DeviceIP = inep.ToString();
+							PayLoad.DeviceCommunity = pkt.Community.ToString();
+							PayLoad.ChildDevices = new List<ChildDevice>();
+
+							foreach (Vb VariablePair in pkt.Pdu.VbList)
 							{
-								Console.WriteLine("**** {0} {1}: {2}",
-								   v.Oid.ToString(), SnmpConstants.GetTypeName(v.Value.Type), v.Value.ToString());
+								var ChildDevice = new ChildDevice();
+								ChildDevice.OID = VariablePair.Oid.ToString();
+
+								if (VariablePair.Value.ToString() == null)
+								{ ChildDevice.Value = "0"; }
+								else
+								{ ChildDevice.Value = VariablePair.Value.ToString(); }
+
+								PayLoad.ChildDevices.Add(ChildDevice);
 							}
-							Console.WriteLine("** End of SNMP Version 2 TRAP data.");
+
+							var Message = DeviceManagerInstance.ConvertPayloadToMessage(PayLoad);
+
+							MessageTranslator.MQTTClient.SendMessage(Message);
 						}
 					}
 				}
 				else
 				{
-					if (inlen == 0)
-						Console.WriteLine("Zero length packet received.");
+						Console.WriteLine("Invalid packet received.");
 				}
 			}
 		}
