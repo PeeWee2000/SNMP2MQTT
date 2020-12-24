@@ -18,3 +18,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "SNMP2MQTT_cs_dotnet.dll"]
+
+EXPOSE 162/tcp
+EXPOSE 162/udp
+EXPOSE 1883/tcp
+EXPOSE 1883/udp

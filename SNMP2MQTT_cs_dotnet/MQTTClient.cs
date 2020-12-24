@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 
 namespace SNMP2MQTT_cs_dotnet
@@ -51,6 +52,14 @@ namespace SNMP2MQTT_cs_dotnet
             }
 
             await Client.ConnectAsync(options.Build(), CancellationToken.None);
+
+
+            var Message = new MqttApplicationMessage();
+            Message.Topic = "SNMP2MQTT";
+            Message.Payload = Encoding.UTF8.GetBytes("Online");
+
+
+            await Client.PublishAsync(Message, CancellationToken.None);
 
             while (true)
             {
