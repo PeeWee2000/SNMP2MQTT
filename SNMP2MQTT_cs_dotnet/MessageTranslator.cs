@@ -17,9 +17,7 @@ namespace SNMP2MQTT_cs_dotnet
 
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
 
-            Console.Write(host
-                .AddressList
-                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString());
+            //Console.Write(host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString());
 
 
             Console.WriteLine("Connecting to MQTT Broker...");
@@ -30,7 +28,7 @@ namespace SNMP2MQTT_cs_dotnet
             Console.WriteLine("Starting SNMP Trap");
             var SNMPTrap = new SNMPTrap();
 
-            Console.Write("SNMP Trap started");
+            Console.WriteLine("SNMP Trap started");
 
             SNMPTrap.Start();
 

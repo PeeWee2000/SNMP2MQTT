@@ -23,3 +23,7 @@ EXPOSE 162/tcp
 EXPOSE 162/udp
 EXPOSE 1883/tcp
 EXPOSE 1883/udp
+
+ENV Test="John Doe"
+ARG Wewo
+LABEL Wewo="Pepo"
